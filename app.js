@@ -1,11 +1,13 @@
 // Import necessary libraries
 const express = require("express");
+const cors = require("cors");
 const OpenAI = require("openai");
 require("dotenv").config();
 
 const app = express();
 const port = 5000;
 
+app.use(cors());
 app.use(express.json());
 app.use(
   express.urlencoded({
@@ -67,10 +69,10 @@ app.post("/chatbot", async (req, res) => {
 
   // Retrieve messages from the thread
   const threadMessages = await openai.beta.threads.messages.list(sThread);
-
+  const jawaban = threadMessages.body.data[0].content[0].text.value;
   // Send the thread messages and thread ID as a response
   res.send({
-    message: threadMessages.body.data[0].content[0].text.value,
+    message: jawaban.split("【")[0].replace(/\n/g, "<br>"),
     threadID: sThread,
   });
 });
